@@ -12,3 +12,5 @@ server/dist/
 coverage/
 *.tsbuildinfo
 **/.claude/
+SANITIZATION_REPORT.md
+FORK_REPORT.md

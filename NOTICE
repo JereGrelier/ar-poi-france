@@ -1,0 +1,18 @@
+AR POI France — third-party data notice
+=======================================
+
+This application can display Points of Interest from DATAtourisme
+(https://www.datatourisme.fr/), the French national tourism open-data platform
+operated by ADN Tourisme.
+
+DATAtourisme data is published under Licence Ouverte / Open Licence 2.0
+(https://www.etalab.gouv.fr/licence-ouverte-open-licence/).
+
+When using live DATAtourisme data in a product or publication, retain attribution
+to DATAtourisme / ADN Tourisme as required by that licence.
+
+Mock POIs bundled for local development are synthetic and are not DATAtourisme data.
+
+Expo / React Native template assets under `mobile/` may include files originally
+distributed under the MIT License by 650 Industries, Inc. (Expo). See
+`mobile/LICENSE`.
