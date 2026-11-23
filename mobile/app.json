@@ -1,0 +1,51 @@
+{
+  "expo": {
+    "name": "AR POI France",
+    "slug": "ar-poi-france",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Afficher les points d'intérêt autour de vous en réalité augmentée."
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Afficher la caméra pour superposer les POI en réalité augmentée.",
+          "microphonePermission": false,
+          "recordAudioAndroid": false
+        }
+      ]
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Afficher les points d'intérêt autour de vous en réalité augmentée.",
+        "NSCameraUsageDescription": "Afficher la caméra pour superposer les POI en réalité augmentée.",
+        "NSMotionUsageDescription": "Orienter les labels RA selon la direction du téléphone."
+      }
+    },
+    "android": {
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "CAMERA"
+      ],
+      "adaptiveIcon": {
+        "backgroundColor": "#0B1F17",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}

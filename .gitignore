@@ -1,0 +1,14 @@
+# Root monorepo ignores (git reads this on status/add/commit)
+node_modules/
+.expo/
+dist/
+web-build/
+.env
+.env.local
+server/.env
+*.log
+.DS_Store
+server/dist/
+coverage/
+*.tsbuildinfo
+**/.claude/
