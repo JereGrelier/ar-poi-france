@@ -1,39 +1,26 @@
+import {
+  isPoiDetailResponse,
+  isPoiListResponse,
+  type Poi,
+  type PoiListResponse,
+} from "@ar-poi/shared";
 import { API_BASE_URL } from "../config";
-import type { Poi, PoiDetailResponse, PoiListResponse } from "../types";
-
-function isPoiListResponse(value: unknown): value is PoiListResponse {
-  if (!value || typeof value !== "object") return false;
-  const v = value as Record<string, unknown>;
-  return (
-    typeof v.success === "boolean" &&
-    Array.isArray(v.data) &&
-    (v.error === null || typeof v.error === "string") &&
-    typeof v.meta === "object" &&
-    v.meta !== null
-  );
-}
-
-function isPoiDetailResponse(value: unknown): value is PoiDetailResponse {
-  if (!value || typeof value !== "object") return false;
-  const v = value as Record<string, unknown>;
-  return (
-    typeof v.success === "boolean" &&
-    (v.data === null || typeof v.data === "object") &&
-    (v.error === null || typeof v.error === "string")
-  );
-}
 
 export async function fetchNearbyPois(params: {
   latitude: number;
   longitude: number;
   radiusMeters: number;
   type?: string;
+  page?: number;
+  pageSize?: number;
   signal?: AbortSignal;
 }): Promise<PoiListResponse> {
   const query = new URLSearchParams({
     lat: String(params.latitude),
     lon: String(params.longitude),
     radius: String(params.radiusMeters),
+    page: String(params.page ?? 1),
+    pageSize: String(params.pageSize ?? 50),
   });
   if (params.type) query.set("type", params.type);
 

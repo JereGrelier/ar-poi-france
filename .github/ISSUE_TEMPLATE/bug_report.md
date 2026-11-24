@@ -9,14 +9,12 @@ labels: bug
 A clear description of what went wrong.
 
 **Environment**
+
 - OS / device:
 - Expo / Node versions:
 - `MOCK_MODE` (yes/no):
 
-**Steps to reproduce**
-1.
-2.
-3.
+**Steps to reproduce** 1. 2. 3.
 
 **Expected behavior**
 

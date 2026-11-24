@@ -1,5 +1,4 @@
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -9,70 +8,49 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { fetchNearbyPois } from "../api/pois";
+import { AttributionFooter } from "../components/AttributionFooter";
+import { DemoBanner } from "../components/DemoBanner";
 import { FilterBar } from "../components/FilterBar";
-import { DEFAULT_RADIUS_M } from "../config";
+import { useFilters } from "../filters/FiltersContext";
 import { haversineMeters } from "../geo/math";
 import type { RootStackParamList } from "../navigation/types";
 import { usePose } from "../pose/PoseContext";
-import type { Poi } from "../types";
 
 type Props = NativeStackScreenProps<RootStackParamList, "List">;
 
 export function ListScreen({ navigation }: Props) {
-  const { pose, error: poseError, ready } = usePose();
-  const [radiusMeters, setRadiusMeters] = useState(DEFAULT_RADIUS_M);
-  const [typeFilter, setTypeFilter] = useState("");
-  const [pois, setPois] = useState<Poi[]>([]);
-  const [source, setSource] = useState<string>("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { pose, error: poseError, ready, isDemoFallback } = usePose();
+  const {
+    radiusMeters,
+    typeFilter,
+    setRadiusMeters,
+    setTypeFilter,
+    pois,
+    meta,
+    loading,
+    error,
+    refresh,
+  } = useFilters();
 
-  const lat = pose?.latitude;
-  const lon = pose?.longitude;
-
-  const load = useCallback(async (signal?: AbortSignal) => {
-    if (lat == null || lon == null) return;
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await fetchNearbyPois({
-        latitude: lat,
-        longitude: lon,
-        radiusMeters,
-        type: typeFilter || undefined,
-        signal,
-      });
-      if (signal?.aborted) return;
-      setPois(response.data);
-      setSource(response.meta.source);
-    } catch (e) {
-      if (signal?.aborted) return;
-      setError(e instanceof Error ? e.message : "Erreur chargement POI");
-      setPois([]);
-    } finally {
-      if (!signal?.aborted) setLoading(false);
-    }
-  }, [lat, lon, radiusMeters, typeFilter]);
-
-  useEffect(() => {
-    if (!ready || lat == null || lon == null) return;
-    const controller = new AbortController();
-    void load(controller.signal);
-    return () => controller.abort();
-  }, [ready, lat, lon, load]);
   return (
     <SafeAreaView style={styles.safe} edges={["top", "left", "right"]}>
+      <DemoBanner visible={isDemoFallback} />
       <View style={styles.header}>
         <Text style={styles.brand}>AR POI France</Text>
         <Text style={styles.sub}>
-          DATAtourisme · {source || "…"}
+          DATAtourisme · {meta?.source || "…"}
+          {meta?.truncated ? " · liste tronquée" : ""}
           {pose
             ? ` · ${pose.latitude.toFixed(4)}, ${pose.longitude.toFixed(4)}`
             : ""}
         </Text>
         {(poseError || error) && (
           <Text style={styles.warn}>{poseError ?? error}</Text>
+        )}
+        {ready && !pose && !isDemoFallback && (
+          <Text style={styles.warn}>
+            Activez la localisation, ou lancez avec EXPO_PUBLIC_DEMO_FALLBACK=1
+          </Text>
         )}
       </View>
 
@@ -94,7 +72,7 @@ export function ListScreen({ navigation }: Props) {
         <Pressable
           accessibilityRole="button"
           style={styles.secondary}
-          onPress={() => void load()}
+          onPress={() => void refresh()}
         >
           <Text style={styles.secondaryText}>Rafraîchir</Text>
         </Pressable>
@@ -123,7 +101,10 @@ export function ListScreen({ navigation }: Props) {
               <Pressable
                 style={styles.row}
                 onPress={() =>
-                  navigation.navigate("PoiDetail", { poiId: item.id, poi: item })
+                  navigation.navigate("PoiDetail", {
+                    poiId: item.id,
+                    poi: item,
+                  })
                 }
               >
                 <Text style={styles.rowTitle}>{item.name}</Text>
@@ -136,6 +117,7 @@ export function ListScreen({ navigation }: Props) {
           }}
         />
       )}
+      <AttributionFooter source={meta?.source} />
     </SafeAreaView>
   );
 }
@@ -172,7 +154,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   secondaryText: { color: "#F4F0E6" },
-  list: { paddingHorizontal: 12, paddingBottom: 24 },
+  list: { paddingHorizontal: 12, paddingBottom: 24, flexGrow: 1 },
   empty: { color: "rgba(244,240,230,0.5)", textAlign: "center", marginTop: 40 },
   row: {
     paddingVertical: 14,

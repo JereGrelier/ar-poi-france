@@ -1,7 +1,6 @@
 import { useIsFocused } from "@react-navigation/native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { CameraView, useCameraPermissions } from "expo-camera";
-import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -10,61 +9,28 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { fetchNearbyPois } from "../api/pois";
 import { ArOverlay } from "../components/ArOverlay";
+import { DemoBanner } from "../components/DemoBanner";
 import { FilterBar } from "../components/FilterBar";
-import { DEFAULT_RADIUS_M } from "../config";
+import { useFilters } from "../filters/FiltersContext";
 import type { RootStackParamList } from "../navigation/types";
 import { usePose } from "../pose/PoseContext";
-import type { Poi } from "../types";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Ar">;
 
 export function ArScreen({ navigation }: Props) {
   const isFocused = useIsFocused();
   const [permission, requestPermission] = useCameraPermissions();
-  const { pose, error: poseError, ready } = usePose();
-  const [radiusMeters, setRadiusMeters] = useState(DEFAULT_RADIUS_M);
-  const [typeFilter, setTypeFilter] = useState("");
-  const [pois, setPois] = useState<Poi[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  const lat = pose?.latitude;
-  const lon = pose?.longitude;
-
-  const load = useCallback(
-    async (signal?: AbortSignal) => {
-      if (lat == null || lon == null) return;
-      setLoading(true);
-      setError(null);
-      try {
-        const response = await fetchNearbyPois({
-          latitude: lat,
-          longitude: lon,
-          radiusMeters,
-          type: typeFilter || undefined,
-          signal,
-        });
-        if (signal?.aborted) return;
-        setPois(response.data);
-      } catch (e) {
-        if (signal?.aborted) return;
-        setError(e instanceof Error ? e.message : "Erreur POI");
-        setPois([]);
-      } finally {
-        if (!signal?.aborted) setLoading(false);
-      }
-    },
-    [lat, lon, radiusMeters, typeFilter],
-  );
-
-  useEffect(() => {
-    if (!ready || lat == null || lon == null) return;
-    const controller = new AbortController();
-    void load(controller.signal);
-    return () => controller.abort();
-  }, [ready, lat, lon, load]);
+  const { pose, error: poseError, isDemoFallback } = usePose();
+  const {
+    radiusMeters,
+    typeFilter,
+    setRadiusMeters,
+    setTypeFilter,
+    pois,
+    loading,
+    error,
+  } = useFilters();
 
   if (!permission) {
     return (
@@ -107,6 +73,7 @@ export function ArScreen({ navigation }: Props) {
       )}
 
       <SafeAreaView style={styles.hud} pointerEvents="box-none">
+        <DemoBanner visible={isDemoFallback} />
         <FilterBar
           radiusMeters={radiusMeters}
           typeFilter={typeFilter}

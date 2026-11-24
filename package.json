@@ -1,10 +1,22 @@
 {
   "name": "ar-poi-france",
   "private": true,
+  "workspaces": [
+    "packages/*",
+    "server",
+    "mobile"
+  ],
   "scripts": {
     "server": "npm --prefix server run start",
     "server:dev": "npm --prefix server run dev",
     "mobile": "npm --prefix mobile run start",
-    "check": "npm --prefix server run check && npm --prefix mobile run check"
+    "check": "npm run check --workspace=@ar-poi/shared && npm run check --workspace=ar-map-proxy && npm run check --workspace=mobile",
+    "test": "npm run test --workspace=@ar-poi/shared && npm run test --workspace=ar-map-proxy",
+    "typecheck": "npm run typecheck --workspace=@ar-poi/shared && npm run typecheck --workspace=ar-map-proxy && npm run typecheck --workspace=mobile",
+    "lint": "prettier --check .",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "prettier": "^3.5.3"
   }
 }

@@ -4,12 +4,17 @@
 
 Follow the [README](README.md) quick start. Use `MOCK_MODE=1` unless you have a DATAtourisme API key.
 
+```bash
+npm install
+```
+
 ## Checks before a PR
 
 ```bash
 npm run check
-npm --prefix server exec tsc --noEmit
-npm --prefix mobile exec tsc --noEmit
+npm test
+npm run typecheck
+npm run lint
 ```
 
 ## Guidelines
@@ -18,6 +23,7 @@ npm --prefix mobile exec tsc --noEmit
 - Prefer small, focused PRs
 - Do not commit `.env`, credentials, or personal device IPs
 - Respect [NOTICE](NOTICE) when documenting or redistributing tourism data
+- Shared types/geo live in `packages/shared` (`@ar-poi/shared`)
 
 ## Issues
 

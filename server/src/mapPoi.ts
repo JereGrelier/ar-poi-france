@@ -1,4 +1,4 @@
-import type { Poi } from "./types.js";
+import type { Poi } from "@ar-poi/shared";
 
 type RawPoi = Record<string, unknown>;
 
@@ -45,7 +45,9 @@ function extractTypes(raw: RawPoi): string[] {
   return [];
 }
 
-function extractGeo(raw: RawPoi): { latitude: number; longitude: number } | null {
+function extractGeo(
+  raw: RawPoi,
+): { latitude: number; longitude: number } | null {
   const located = raw.isLocatedAt;
   const locations = Array.isArray(located) ? located : located ? [located] : [];
   for (const loc of locations) {

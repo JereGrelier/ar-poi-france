@@ -20,5 +20,7 @@ Contact the maintainer via GitHub: [@JereGrelier](https://github.com/JereGrelier
 ## Hardening tips for deployers
 
 1. Never embed the DATAtourisme key in the mobile app
-2. Restrict CORS / network access if the proxy is not localhost-only
-3. Rotate the API key if it may have been exposed
+2. Set `CORS_ORIGINS` to an explicit allowlist (not `*`) when the proxy is reachable beyond localhost
+3. Tune `RATE_LIMIT_MAX` / `RATE_LIMIT_WINDOW_MS` for your traffic
+4. Put TLS (and optionally auth) in front of the proxy for internet exposure
+5. Rotate the API key if it may have been exposed

@@ -9,29 +9,35 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import type { Poi } from "@ar-poi/shared";
 import { fetchPoiById } from "../api/pois";
+import { AttributionFooter } from "../components/AttributionFooter";
+import { useFilters } from "../filters/FiltersContext";
 import type { RootStackParamList } from "../navigation/types";
-import type { Poi } from "../types";
 
 type Props = NativeStackScreenProps<RootStackParamList, "PoiDetail">;
 
 export function PoiDetailScreen({ route }: Props) {
   const { poiId, poi: initial } = route.params;
+  const { meta } = useFilters();
   const [poi, setPoi] = useState<Poi | null>(initial ?? null);
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(!initial);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
     async function load() {
-      if (initial) return;
       setLoading(true);
       try {
         const data = await fetchPoiById(poiId);
-        if (!cancelled) setPoi(data);
+        if (!cancelled) {
+          setPoi(data);
+          setError(null);
+        }
       } catch (e) {
         if (!cancelled) {
           setError(e instanceof Error ? e.message : "Erreur détail");
+          if (!initial) setPoi(null);
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -43,7 +49,7 @@ export function PoiDetailScreen({ route }: Props) {
     };
   }, [poiId, initial]);
 
-  if (loading) {
+  if (loading && !poi) {
     return (
       <View style={styles.center}>
         <ActivityIndicator color="#C4A35A" />
@@ -87,7 +93,11 @@ export function PoiDetailScreen({ route }: Props) {
           <Text style={styles.description}>Pas de description disponible.</Text>
         )}
         {error ? <Text style={styles.error}>{error}</Text> : null}
+        {loading ? (
+          <ActivityIndicator color="#C4A35A" style={{ marginTop: 12 }} />
+        ) : null}
       </ScrollView>
+      <AttributionFooter source={meta?.source} />
     </SafeAreaView>
   );
 }
